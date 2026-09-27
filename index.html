@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="es-VE">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tasa al día · Dólar BCV, USDT Binance y Euro en Venezuela</title>
+<meta name="description" content="Dólar BCV, USDT en Binance P2P y Euro BCV en bolívares, actualizados cada 30 segundos, con calculadora.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💱</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --papel:#E9EEF2; --tinta:#16202B; --suave:#5B6878;
+  --pizarra:#0F2440; --pizarra-2:#17325A; --linea:#2A4670; --claro:#F3F6F9;
+  --oro:#E8B931; --sube:#3DBE7A; --baja:#F0655A;
+  --display:"Big Shoulders Display", "Arial Narrow", "Roboto Condensed", sans-serif;
+  --texto:"Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root{ --papel:#0A1829; --tinta:#E6ECF2; --suave:#93A3B6; --pizarra:#122B4D; --pizarra-2:#1A3963; --linea:#2C4C79; }
+}
+*,*::before,*::after{box-sizing:inherit}
+html{height:100%}
+body{margin:0;min-height:100%;background:var(--papel);color:var(--tinta);font:400 1rem/1.5 var(--texto);-webkit-font-smoothing:antialiased}
+.envoltura{max-width:34rem;margin:0 auto;padding:1.25rem 1rem 3rem}
+
+header{display:flex;align-items:baseline;justify-content:space-between;gap:1rem;margin-bottom:1rem}
+h1{font:800 2.1rem/1 var(--display);margin:0;letter-spacing:.01em}
+.vivo{display:flex;align-items:center;gap:.45rem;font-size:.85rem;color:var(--suave);white-space:nowrap}
+.punto{width:.55rem;height:.55rem;border-radius:50%;background:var(--sube);box-shadow:0 0 0 0 var(--sube)}
+.vivo.activo .punto{animation:latido 2s ease-out infinite}
+.vivo.error .punto{background:var(--baja);animation:none}
+@keyframes latido{0%{box-shadow:0 0 0 0 rgba(61,190,122,.55)}100%{box-shadow:0 0 0 .6rem rgba(61,190,122,0)}}
+
+/* La pizarra: el elemento protagonista, como el tablero de una casa de cambio */
+.pizarra{background:var(--pizarra);color:var(--claro);border-radius:14px;padding:.35rem 1.1rem;
+  box-shadow:inset 0 0 0 1px var(--linea)}
+.fila{display:grid;grid-template-columns:1fr auto;align-items:center;gap:.25rem 1rem;padding:1rem 0;border-bottom:1px solid var(--linea)}
+.fila:last-child{border-bottom:0}
+.nombre{font-weight:600;font-size:1.05rem}
+.fuente{font-size:.8rem;color:#9FB2CA}
+.fuente.respaldo{color:var(--oro)}
+.cifra{font:800 clamp(2.4rem,11vw,3.3rem)/1 var(--display);font-variant-numeric:tabular-nums;text-align:right;letter-spacing:.01em}
+.cifra small{font:600 .45em var(--display);color:#9FB2CA;margin-right:.2em;vertical-align:.35em}
+.cifra.cambio-sube{animation:flashSube 1.4s ease-out}
+.cifra.cambio-baja{animation:flashBaja 1.4s ease-out}
+@keyframes flashSube{0%{color:var(--sube)}100%{color:var(--claro)}}
+@keyframes flashBaja{0%{color:var(--baja)}100%{color:var(--claro)}}
+.var{grid-column:2;text-align:right;font-size:.8rem;font-variant-numeric:tabular-nums;color:#9FB2CA;min-height:1.2em}
+.var.sube{color:var(--sube)} .var.baja{color:var(--baja)}
+.detalle{grid-column:1/-1;font-size:.82rem;color:#9FB2CA;font-variant-numeric:tabular-nums}
+.no-disp{font:600 1.1rem var(--texto);color:#9FB2CA}
+
+.brecha{display:flex;justify-content:space-between;gap:1rem;margin:.9rem .2rem 0;font-size:.92rem;color:var(--suave)}
+.brecha strong{color:var(--tinta);font-variant-numeric:tabular-nums}
+
+/* Calculadora */
+h2{font:800 1.6rem/1.1 var(--display);margin:2.2rem 0 .8rem}
+.monedas{display:grid;grid-template-columns:repeat(4,1fr);gap:.35rem;margin-bottom:.6rem}
+.monedas button{font:600 .9rem var(--texto);padding:.6rem .2rem;border-radius:8px;border:1px solid color-mix(in srgb,var(--tinta) 18%,transparent);
+  background:transparent;color:var(--tinta);cursor:pointer}
+.monedas button[aria-pressed="true"]{background:var(--pizarra);border-color:var(--pizarra);color:var(--claro)}
+.monto{width:100%;font:800 2.4rem/1 var(--display);font-variant-numeric:tabular-nums;padding:.55rem .8rem;border-radius:10px;
+  border:2px solid color-mix(in srgb,var(--tinta) 22%,transparent);background:transparent;color:var(--tinta)}
+.monto:focus{outline:none;border-color:var(--oro)}
+button:focus-visible{outline:3px solid var(--oro);outline-offset:2px}
+.equivalencias{list-style:none;margin:.8rem 0 0;padding:0}
+.equivalencias li{display:flex;justify-content:space-between;align-items:baseline;gap:1rem;padding:.55rem .2rem;border-bottom:1px solid color-mix(in srgb,var(--tinta) 12%,transparent)}
+.equivalencias span{color:var(--suave);font-size:.92rem}
+.equivalencias strong{font:600 1.5rem var(--display);font-variant-numeric:tabular-nums}
+.copiar{background:none;border:0;padding:0;font:inherit;color:inherit;cursor:pointer;text-align:right}
+
+.bolivar{margin-top:2rem;padding:1rem 1.1rem;border-left:4px solid var(--oro);background:color-mix(in srgb,var(--oro) 10%,transparent);border-radius:0 10px 10px 0;font-size:.95rem}
+.bolivar strong{font-variant-numeric:tabular-nums}
+footer{margin-top:2.5rem;font-size:.8rem;color:var(--suave);line-height:1.6}
+footer button{font:600 .85rem var(--texto);background:none;border:1px solid currentColor;color:var(--tinta);border-radius:8px;padding:.45rem .8rem;cursor:pointer;margin-bottom:.8rem}
+.aviso{margin-top:1rem;padding:.8rem 1rem;border-radius:10px;background:color-mix(in srgb,var(--baja) 14%,transparent);font-size:.9rem;display:none}
+.aviso.visible{display:block}
+
+@media (prefers-reduced-motion:reduce){ *{animation:none!important} }
+</style>
+</head>
+<body>
+<div class="envoltura">
+  <header>
+    <h1>Tasa al día</h1>
+    <div class="vivo" id="vivo" role="status" aria-live="polite"><span class="punto"></span><span id="estado">Conectando…</span></div>
+  </header>
+
+  <section class="pizarra" aria-label="Tasas en bolívares">
+    <div class="fila" id="fila-usd">
+      <div><div class="nombre">Dólar BCV</div><div class="fuente">Banco Central de Venezuela</div></div>
+      <div class="cifra" data-cifra>—</div>
+      <div class="var" data-var></div>
+    </div>
+    <div class="fila" id="fila-usdt">
+      <div><div class="nombre">USDT Binance</div><div class="fuente" data-fuente>Binance P2P</div></div>
+      <div class="cifra" data-cifra>—</div>
+      <div class="var" data-var></div>
+      <div class="detalle" data-detalle></div>
+    </div>
+    <div class="fila" id="fila-eur">
+      <div><div class="nombre">Euro BCV</div><div class="fuente">Banco Central de Venezuela</div></div>
+      <div class="cifra" data-cifra>—</div>
+      <div class="var" data-var></div>
+    </div>
+  </section>
+  <div class="brecha"><span>Brecha entre USDT y dólar BCV</span><strong id="brecha">—</strong></div>
+  <div class="aviso" id="aviso"></div>
+
+  <h2>Calcula</h2>
+  <div class="monedas" role="group" aria-label="Moneda del monto">
+    <button type="button" data-moneda="ves" aria-pressed="false">Bs</button>
+    <button type="button" data-moneda="usd" aria-pressed="true">$ BCV</button>
+    <button type="button" data-moneda="usdt" aria-pressed="false">USDT</button>
+    <button type="button" data-moneda="eur" aria-pressed="false">€ BCV</button>
+  </div>
+  <label for="monto" class="fuente" style="display:block;color:var(--suave);margin-bottom:.3rem">Monto</label>
+  <input id="monto" class="monto" inputmode="decimal" autocomplete="off" value="1">
+  <ul class="equivalencias" id="equivalencias"></ul>
+
+  <p class="bolivar" id="bolivar">Calculando cuánto vale un bolívar…</p>
+
+  <footer>
+    <button type="button" id="refrescar">Actualizar ahora</button>
+    <div>Las tasas se actualizan solas cada 30 segundos. Dólar y euro: tasa oficial publicada por el BCV. USDT: mediana de los 10 mejores anuncios de comerciantes verificados en Binance P2P, promedio entre compra y venta. Valores referenciales, no constituyen asesoría financiera.</div>
+  </footer>
+</div>
+
+<script>
+(() => {
+  const INTERVALO = 30000;
+  const nf = (d) => new Intl.NumberFormat("es-VE", { minimumFractionDigits: d, maximumFractionDigits: d });
+  const f2 = nf(2), f4 = nf(4);
+  const tasas = { ves: 1, usd: null, usdt: null, eur: null };
+  const etiquetas = { ves: "Bolívares", usd: "Dólares al BCV", usdt: "USDT en Binance", eur: "Euros al BCV" };
+  const simbolos = { ves: "Bs", usd: "$", usdt: "USDT", eur: "€" };
+  let moneda = "usd", ultimoOk = 0, temporizador = null;
+
+  const guardado = (() => { try { return JSON.parse(localStorage.getItem("tasas-previas") || "{}"); } catch { return {}; } })();
+  const guardar = () => { try { localStorage.setItem("tasas-previas", JSON.stringify(guardado)); } catch {} };
+
+  function pintarFila(clave, dato) {
+    const fila = document.getElementById("fila-" + clave);
+    const cifra = fila.querySelector("[data-cifra]");
+    const v = fila.querySelector("[data-var]");
+    if (!dato || dato.error || !Number.isFinite(dato.valor)) {
+      if (tasas[clave] == null) cifra.innerHTML = '<span class="no-disp">No disponible</span>';
+      v.textContent = tasas[clave] == null ? "Reintentando en 30 s" : "Mostrando el último valor";
+      return;
+    }
+    const nuevo = dato.valor, anterior = tasas[clave];
+    tasas[clave] = nuevo;
+    cifra.innerHTML = "<small>Bs</small>" + f2.format(nuevo);
+    if (anterior != null && nuevo !== anterior) {
+      cifra.classList.remove("cambio-sube", "cambio-baja"); void cifra.offsetWidth;
+      cifra.classList.add(nuevo > anterior ? "cambio-sube" : "cambio-baja");
+    }
+    // Variación frente al último valor distinto que vio este navegador
+    const reg = guardado[clave] || {};
+    if (reg.actual !== nuevo) { if (reg.actual != null) reg.previo = reg.actual; reg.actual = nuevo; guardado[clave] = reg; guardar(); }
+    if (reg.previo) {
+      const pct = (nuevo / reg.previo - 1) * 100;
+      v.className = "var " + (pct > 0 ? "sube" : pct < 0 ? "baja" : "");
+      v.textContent = (pct > 0 ? "▲ " : pct < 0 ? "▼ " : "") + f2.format(Math.abs(pct)) + " % desde el valor anterior";
+    } else { v.className = "var"; v.textContent = ""; }
+
+    if (clave === "usdt") {
+      const fuente = fila.querySelector("[data-fuente]");
+      fuente.textContent = dato.fuente;
+      fuente.classList.toggle("respaldo", !!dato.respaldo);
+      fila.querySelector("[data-detalle]").textContent = dato.compra
+        ? `Compra ${f2.format(dato.compra)} · Venta ${f2.format(dato.venta)}` : "Binance no respondió; se muestra la tasa paralela.";
+    }
+  }
+
+  function calcular() {
+    const bruto = document.getElementById("monto").value.trim().replace(/\./g, "").replace(",", ".");
+    const monto = parseFloat(bruto);
+    const lista = document.getElementById("equivalencias");
+    const enBs = Number.isFinite(monto) && tasas[moneda] ? monto * tasas[moneda] : null;
+    lista.innerHTML = "";
+    for (const k of ["ves", "usd", "usdt", "eur"]) {
+      if (k === moneda) continue;
+      const li = document.createElement("li");
+      const val = enBs != null && tasas[k] ? enBs / tasas[k] : null;
+      li.innerHTML = `<span>${etiquetas[k]}</span>`;
+      const b = document.createElement("button");
+      b.className = "copiar"; b.type = "button";
+      b.innerHTML = `<strong>${val == null ? "—" : simbolos[k] + " " + f2.format(val)}</strong>`;
+      b.title = "Copiar";
+      b.addEventListener("click", () => val != null && navigator.clipboard?.writeText(f2.format(val)));
+      li.appendChild(b); lista.appendChild(li);
+    }
+  }
+
+  function pintarExtras() {
+    const br = document.getElementById("brecha");
+    br.textContent = tasas.usd && tasas.usdt ? f2.format((tasas.usdt / tasas.usd - 1) * 100) + " %" : "—";
+    const bol = document.getElementById("bolivar");
+    if (tasas.usd) {
+      const cien = 100 / tasas.usd;
+      bol.innerHTML = `Un bolívar vale <strong>$ ${f4.format(1 / tasas.usd)}</strong> al BCV${tasas.usdt ? ` y <strong>${f4.format(1 / tasas.usdt)} USDT</strong> en Binance` : ""}. Con Bs 100 compras <strong>$ ${f2.format(cien)}</strong> a tasa oficial.`;
+    }
+  }
+
+  function tiempo() {
+    const el = document.getElementById("estado");
+    if (!ultimoOk) return;
+    const s = Math.round((Date.now() - ultimoOk) / 1000);
+    el.textContent = s < 5 ? "En vivo, recién actualizado" : `En vivo, hace ${s} s`;
+  }
+
+  async function cargar() {
+    const vivo = document.getElementById("vivo"), aviso = document.getElementById("aviso");
+    try {
+      const r = await fetch("/api/tasas", { cache: "no-store" });
+      if (!r.ok) throw new Error("El servidor respondió " + r.status);
+      const d = await r.json();
+      pintarFila("usd", d.usd); pintarFila("usdt", d.usdt); pintarFila("eur", d.eur);
+      pintarExtras(); calcular();
+      ultimoOk = Date.now(); vivo.className = "vivo activo"; aviso.classList.remove("visible"); tiempo();
+    } catch (e) {
+      vivo.className = "vivo error";
+      document.getElementById("estado").textContent = "Sin conexión";
+      aviso.textContent = "No se pudieron consultar las tasas. Revisa tu conexión; se reintentará en 30 segundos.";
+      aviso.classList.add("visible");
+    }
+  }
+
+  function programar() { clearInterval(temporizador); temporizador = setInterval(cargar, INTERVALO); }
+
+  document.querySelectorAll("[data-moneda]").forEach((b) => b.addEventListener("click", () => {
+    moneda = b.dataset.moneda;
+    document.querySelectorAll("[data-moneda]").forEach((x) => x.setAttribute("aria-pressed", x === b));
+    calcular();
+  }));
+  document.getElementById("monto").addEventListener("input", calcular);
+  document.getElementById("refrescar").addEventListener("click", () => { cargar(); programar(); });
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) clearInterval(temporizador); else { cargar(); programar(); }
+  });
+  setInterval(tiempo, 1000);
+  cargar(); programar(); calcular();
+})();
+</script>
+</body>
+</html>

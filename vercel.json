@@ -1,0 +1,4 @@
+{
+  "regions": ["gru1"],
+  "functions": { "api/tasas.js": { "maxDuration": 15 } }
+}

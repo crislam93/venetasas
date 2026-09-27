@@ -1,0 +1,5 @@
+{
+  "name": "tasas-ve",
+  "private": true,
+  "engines": { "node": ">=18" }
+}
